@@ -24,8 +24,14 @@ export const cartSlice = createSlice({
           ])
         : (state.favorite = [...state.favorite, action.payload]);
     },
+    removeFromFavorite: (state, action: PayloadAction<number>) => {
+      state.favorite = state.favorite.filter(id => id !== action.payload);
+    },
+    clearFavorites: (state) => {
+      state.favorite = [];
+    },
   },
 });
 
-export const {addToCart, addToFavorite} = cartSlice.actions;
+export const {addToCart, addToFavorite, removeFromFavorite, clearFavorites} = cartSlice.actions;
 export default cartSlice.reducer;

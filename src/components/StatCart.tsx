@@ -15,7 +15,7 @@ const StatCart = () => {
                     Кількість товарів у корзині: {products.length}
                 </Text>
                 <Text style={styles.favText}>
-                    Кількість уподобаних товарів: {favorite.length}
+                    Кількість обраних товарів: {favorite.length}
                 </Text>
             </View>
         </View>

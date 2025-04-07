@@ -3,69 +3,76 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Image,
 } from 'react-native';
 import React from 'react';
-import {useDispatch} from 'react-redux';
-import {addToFavorite, addToCart} from '../store/slices/cartSlice.ts';
-import {useNavigation} from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToFavorite, addToCart } from '../store/slices/cartSlice.ts';
+import { useNavigation } from '@react-navigation/native';
+import { RootState } from '../store';
 
-const ProductItem = ({product, c_width}: any) => {
+const ProductItem = ({ product, c_width }: any) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  // Функція для обрізання опису до 100 символів
+  const favoriteList = useSelector((state: RootState) => state.cart.favorite);
+  const isFavorite = favoriteList.includes(product.id);
+
   const truncateDescription = (description: string) => {
-    if (description.length > 100) {
-      return description.slice(0, 100) + '...';
-    }
-    return description;
+    return description.length > 100 ? description.slice(0, 100) + '...' : description;
   };
 
   return (
-    <View style={{maxWidth: c_width, ...styles.card}} key={product.id}>
-      <Image
-        source={{uri: product.image}}
-        style={styles.image}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>{product.title}</Text>
-      <Text style={styles.category}>Категорія: {product.category}</Text>
-      <Text style={styles.description}>
-        {truncateDescription(product.description)}
-      </Text>
-      <Text style={styles.rating}>
-        Рейтинг: {product.rating?.rate || product.rating}
-      </Text>
-      <View>
-        <TouchableOpacity
-          style={styles.cartButton}
-          onPressIn={() => {
-            dispatch(addToCart(product.id));
-          }}>
-          <Text style={styles.buttonText}>Додати в корзину</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={() => {
-            dispatch(addToFavorite(product.id));
-          }}>
-          <Text style={[styles.buttonText, styles.favoriteText]}>
-            Додати в улюблене
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.viewButton}
-          onPress={() =>
-            navigation.navigate('SingleProduct', {
-              productId: product.id,
-              productCategory: product.category,
-            })
-          }>
-          <Text style={styles.buttonText}>Переглянути</Text>
-        </TouchableOpacity>
+      <View style={{ maxWidth: c_width, ...styles.card }} key={product.id}>
+        <Image
+            source={{ uri: product.image }}
+            style={styles.image}
+            resizeMode="contain"
+        />
+        <Text style={styles.title}>{product.title}</Text>
+        <Text style={styles.category}>Категорія: {product.category}</Text>
+        <Text style={styles.description}>
+          {truncateDescription(product.description)}
+        </Text>
+        <Text style={styles.rating}>
+          Рейтинг: {product.rating?.rate || product.rating}
+        </Text>
+        <View>
+          <TouchableOpacity
+              style={styles.cartButton}
+              onPress={() => dispatch(addToCart(product.id))}
+          >
+            <Text style={styles.buttonText}>Додати в корзину</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              style={[
+                styles.favoriteButton,
+                isFavorite ? styles.favoriteActive : {},
+              ]}
+              onPress={() => dispatch(addToFavorite(product.id))}
+          >
+            <Text
+                style={[
+                  styles.buttonText,
+                  styles.favoriteText,
+                  isFavorite ? styles.favoriteTextActive : {},
+                ]}
+            >
+              {isFavorite ? 'Видалити з обраного' : 'Додати в обране'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+              style={styles.viewButton}
+              onPress={() =>
+                  navigation.navigate('SingleProduct', {
+                    productId: product.id,
+                    productCategory: product.category,
+                  })
+              }
+          >
+            <Text style={styles.buttonText}>Переглянути</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
   );
 };
 
@@ -78,12 +85,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderWidth: 1,
     borderColor: '#ddd',
-    // тіні для iOS
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    // підняття для Android
     elevation: 3,
   },
   image: {
@@ -129,6 +134,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 8,
   },
+  favoriteActive: {
+    backgroundColor: '#d9534f',
+  },
   viewButton: {
     backgroundColor: '#131921',
     paddingVertical: 8,
@@ -144,6 +152,9 @@ const styles = StyleSheet.create({
   },
   favoriteText: {
     color: '#000',
+  },
+  favoriteTextActive: {
+    color: '#fff',
   },
 });
 
